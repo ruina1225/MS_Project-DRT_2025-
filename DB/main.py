@@ -77,27 +77,42 @@ async def get_user_visits(user_id: int):
 
     return {"user_visits": visits}
 
-# @app.post("/voice-search/")
-# async def voice_search(audio: UploadFile):
-#     text = transcribe_audio(await audio.read())
-#     sql = generate_sql_from_text(text)
-#     hospitals = get_hospitals(sql)
-#     route_info = get_best_route(hospitals)
-#     return {"query": text, "results": hospitals, "route": route_info}
 
-@app.get("/test/")
-async def test_route(audio_path: str):
-    # 1) 음성 파일 경로를 받아서 음성 인식 (예시: 로컬 경로 or URL)
-    with open(audio_path, "rb") as f:
-        audio_bytes = f.read()
-    text = transcribe_audio(audio_bytes)
+# @app.get("/test/")
+# async def test_route(audio_path: str):
+#     # 1) 음성 파일 경로를 받아서 음성 인식 (예시: 로컬 경로 or URL)
+#     with open(audio_path, "rb") as f:
+#         audio_bytes = f.read()
+#     text = transcribe_audio(audio_bytes)
 
-    # 2) 오라클 DB에서 간단 쿼리 (예: 병원 5개만 조회)
-    cursor = con.cursor()
-    cursor.execute("SELECT hospital_name FROM hospitals WHERE ROWNUM <= 5")
-    hospitals = [row[0] for row in cursor.fetchall()]
+#     # 2) 오라클 DB에서 간단 쿼리 (예: 병원 5개만 조회)
+#     cursor = con.cursor()
+#     cursor.execute("SELECT hospital_name FROM hospitals WHERE ROWNUM <= 5")
+#     hospitals = [row[0] for row in cursor.fetchall()]
 
-    return {
-        "transcribed_text": text,
-        "hospitals_sample": hospitals
-    }
+#     return {
+#         "transcribed_text": text,
+#         "hospitals_sample": hospitals
+#     }
+
+
+@app.get("/voice/")
+async def voice_search():
+    f = open("C:\\Users\\soldesk\\Desktop\\norangCode\\새 폴더\\MS_Project-DRT_2025-\\DB\\test.m4a.m4a", 'w')
+    text = transcribe_audio(f)
+    f.close()
+    # print(text)
+    return {"users": "asdfasdf"}
+    # sql = generate_sql_from_text(text)
+    # hospitals = get_hospitals(sql)
+    # route_info = get_best_route(hospitals)
+    # return {"query": text, "results": hospitals, "route": route_info}
+
+
+@app.get("/voice/")
+async def voice_search(audio: UploadFile):
+    text = transcribe_audio(await audio.read())
+    sql = generate_sql_from_text(text)
+    hospitals = get_hospitals(sql)
+    route_info = get_best_route(hospitals)
+    return {"query": text, "results": hospitals, "route": route_info}
