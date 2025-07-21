@@ -4,6 +4,9 @@ from fastapi import FastAPI, UploadFile
 from oracledb import makedsn, connect
 import oracledb
 from whisper_integration import transcribe_audio
+from fastapi import FastAPI, UploadFile, HTTPException, Form
+from fastapi.middleware.cors import CORSMiddleware
+import users  # users.py에서 라우터 불러오기
 # from query_llm import generate_sql_from_text
 # from database import get_hospitals
 # from routing import get_best_route
@@ -13,29 +16,87 @@ con = oracledb.connect(user="ynchoi", password="chldPsk", dsn=dsn)
 
 
 app = FastAPI()
+app.include_router(users.router, prefix="/users")
 
 
-@app.get("/hospitals")
-async def get_hospitals():
-    cursor = con.cursor()
-    cursor.execute("SELECT name FROM hospitals_drt")
-    result = cursor.fetchall()
-    cursor.close()
-    return {"hospitals": [row[0] for row in result]}
+
+# @app.get("/users")
+# async def get_users():
+#     cursor = con.cursor()
+#     cursor.execute("SELECT user_id, name FROM users_drt")
+#     rows = cursor.fetchall()
+#     cursor.close()
+    
+#     users = []
+#     for user_id, name in rows:
+#         users.append({"user_id": user_id, "name": name})
+    
+#     return {"users": users}
 
 @app.get("/users")
 async def get_users():
     cursor = con.cursor()
-    cursor.execute("SELECT user_id, name FROM users_drt")
+    cursor.execute("""
+        SELECT user_id, name, birth_date, identifier_code
+        FROM users_drt
+        ORDER BY user_id
+    """)
     rows = cursor.fetchall()
     cursor.close()
-    
+
     users = []
-    for user_id, name in rows:
-        users.append({"user_id": user_id, "name": name})
-    
+    for row in rows:
+        users.append({
+            "user_id": row[0],
+            "name": row[1],
+            "birth_date": row[2].strftime("%Y-%m-%d"),
+            "identifier_code": row[3],
+        })
+
     return {"users": users}
 
+
+# CORS 허용
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.post("/users")
+async def create_user(
+    name: str = Form(...),
+    birth_date: str = Form(...),
+    identifier_code: str = Form(...)
+):
+    cursor = con.cursor()
+    cursor.execute("""
+        INSERT INTO users_drt (name, birth_date, identifier_code)
+        VALUES (:name, TO_DATE(:birth_date, 'YYYY-MM-DD'), :identifier_code)
+    """, {"name": name, "birth_date": birth_date, "identifier_code": identifier_code})
+    con.commit()
+    cursor.close()
+    return {"message": "사용자 추가 완료"}
+
+
+
+@app.delete("/users/{user_id}")
+async def delete_user(user_id: int):
+    cursor = con.cursor()
+    cursor.execute("DELETE FROM users_drt WHERE user_id = :user_id", {"user_id": user_id})
+    con.commit()
+    cursor.close()
+    return {"message": "사용자 삭제 완료"}
+
+@app.get("/hospitals")
+async def get_hospitals():
+    cursor = con.cursor()
+    cursor.execute("SELECT name, hospital_id FROM hospitals_drt")
+    result = cursor.fetchall()
+    cursor.close()
+    return {"hospitals": [row[0] for row in result],}
 
 @app.get("/user_visits/{user_id}")
 async def get_user_visits(user_id: int):
@@ -96,23 +157,3 @@ async def get_user_visits(user_id: int):
 #     }
 
 
-@app.get("/voice/")
-async def voice_search():
-    f = open("C:\\Users\\soldesk\\Desktop\\norangCode\\새 폴더\\MS_Project-DRT_2025-\\DB\\test.m4a.m4a", 'w')
-    text = transcribe_audio(f)
-    f.close()
-    # print(text)
-    return {"users": "asdfasdf"}
-    # sql = generate_sql_from_text(text)
-    # hospitals = get_hospitals(sql)
-    # route_info = get_best_route(hospitals)
-    # return {"query": text, "results": hospitals, "route": route_info}
-
-
-@app.get("/voice/")
-async def voice_search(audio: UploadFile):
-    text = transcribe_audio(await audio.read())
-    sql = generate_sql_from_text(text)
-    hospitals = get_hospitals(sql)
-    route_info = get_best_route(hospitals)
-    return {"query": text, "results": hospitals, "route": route_info}
