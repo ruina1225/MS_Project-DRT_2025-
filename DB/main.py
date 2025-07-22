@@ -7,6 +7,7 @@ from whisper_integration import transcribe_audio
 from fastapi import FastAPI, UploadFile, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 import users  # users.py에서 라우터 불러오기
+
 # from query_llm import generate_sql_from_text
 # from database import get_hospitals
 # from routing import get_best_route
@@ -20,19 +21,16 @@ app.include_router(users.router, prefix="/users")
 
 
 
-# @app.get("/users")
-# async def get_users():
-#     cursor = con.cursor()
-#     cursor.execute("SELECT user_id, name FROM users_drt")
-#     rows = cursor.fetchall()
-#     cursor.close()
-    
-#     users = []
-#     for user_id, name in rows:
-#         users.append({"user_id": user_id, "name": name})
-    
-#     return {"users": users}
+# CORS 허용
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 개발 시에는 ["http://localhost:3000"] 도 가능
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# 전체 사용자 조회
 @app.get("/users")
 async def get_users():
     cursor = con.cursor()
@@ -55,16 +53,7 @@ async def get_users():
 
     return {"users": users}
 
-
-# CORS 허용
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# 사용자 추가
 @app.post("/users")
 async def create_user(
     name: str = Form(...),
@@ -80,8 +69,7 @@ async def create_user(
     cursor.close()
     return {"message": "사용자 추가 완료"}
 
-
-
+# 사용자 삭제
 @app.delete("/users/{user_id}")
 async def delete_user(user_id: int):
     cursor = con.cursor()
@@ -90,6 +78,7 @@ async def delete_user(user_id: int):
     cursor.close()
     return {"message": "사용자 삭제 완료"}
 
+# 병원 목록 조회
 @app.get("/hospitals")
 async def get_hospitals():
     cursor = con.cursor()
@@ -98,6 +87,36 @@ async def get_hospitals():
     cursor.close()
     return {"hospitals": [row[0] for row in result],}
 
+# 방문자 목록 조회 (병원 ID 필터링 가능) ->> 수정필요#########################
+# @app.get("/visitors")
+# def get_visitors(hospital_id: int = None):
+#     con = get_connection()
+#     cursor = con.cursor()
+#     if hospital_id:
+#         cursor.execute("""
+#             SELECT visitor_id, name, visit_time, hospital_id 
+#             FROM VISITORS_DRT WHERE hospital_id = :1
+#         """, (hospital_id,))
+#     else:
+#         cursor.execute("""
+#             SELECT visitor_id, name, visit_time, hospital_id 
+#             FROM VISITORS_DRT
+#         """)
+#     result = cursor.fetchall()
+#     visitors = [
+#         {
+#             "id": row[0],
+#             "name": row[1],
+#             "visit_time": row[2],
+#             "hospital_id": row[3]
+#         }
+#         for row in result
+#     ]
+#     cursor.close()
+#     con.close()
+#     return visitors
+
+# 사용자 ID에 따른 방문 내역 조회
 @app.get("/user_visits/{user_id}")
 async def get_user_visits(user_id: int):
     cursor = con.cursor()
@@ -155,5 +174,4 @@ async def get_user_visits(user_id: int):
 #         "transcribed_text": text,
 #         "hospitals_sample": hospitals
 #     }
-
 
