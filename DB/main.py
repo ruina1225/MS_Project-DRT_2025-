@@ -175,3 +175,24 @@ async def get_user_visits(user_id: int):
 #         "hospitals_sample": hospitals
 #     }
 
+
+# 위치추가 
+@app.get("/location")
+def create_location(lat: float, lng: float):
+    cursor = con.cursor()
+    cursor.execute("""
+        INSERT INTO LOCATION_DRT (lat, lng)
+        VALUES (:lat, :lng)
+    """, {"lat": lat, "lng": lng})
+    con.commit()
+    cursor.close()
+    return {"message": "위치 추가 완료"}
+#위치조회
+@app.get("/locations")
+def read_locations():
+    cursor = con.cursor()
+    cursor.execute("SELECT lat, lng FROM LOCATION_DRT")
+    rows = cursor.fetchall()
+    cursor.close()
+    
+    return {"locations": [{"lat": row[0], "lng": row[1]} for row in rows]}
