@@ -12,14 +12,12 @@ import users  # users.py에서 라우터 불러오기
 # from database import get_hospitals
 # from routing import get_best_route
 
-dsn = oracledb.makedsn("195.168.9.70", 1521, service_name="xe")
-con = oracledb.connect(user="ynchoi", password="chldPsk", dsn=dsn)
+dsn = oracledb.makedsn("195.168.9.216", 1521, service_name="xe")
+con = oracledb.connect(user="mb", password="mobridge", dsn=dsn)
 
 
 app = FastAPI()
 app.include_router(users.router, prefix="/users")
-
-
 
 # CORS 허용
 app.add_middleware(
@@ -77,6 +75,7 @@ async def delete_user(user_id: int):
     con.commit()
     cursor.close()
     return {"message": "사용자 삭제 완료"}
+#==================================================================================================#
 
 # 병원 목록 조회
 @app.get("/hospitals")
@@ -157,7 +156,6 @@ async def get_user_visits(user_id: int):
 
     return {"user_visits": visits}
 
-
 # @app.get("/test/")
 # async def test_route(audio_path: str):
 #     # 1) 음성 파일 경로를 받아서 음성 인식 (예시: 로컬 경로 or URL)
@@ -174,8 +172,7 @@ async def get_user_visits(user_id: int):
 #         "transcribed_text": text,
 #         "hospitals_sample": hospitals
 #     }
-
-
+#==================================================================================#
 # 위치추가 
 @app.get("/location")
 def create_location(lat: float, lng: float):

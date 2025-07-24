@@ -18,8 +18,8 @@ df.to_csv(output_path, index=False, encoding="utf-8-sig")
 print("✅ 저장 완료: hospitals_geocoded_final.csv")
 
 # Oracle 연결 정보
-dsn = oracledb.makedsn("195.168.9.70", 1521, service_name="xe")
-con = oracledb.connect(user="ynchoi", password="chldPsk", dsn=dsn)
+dsn = oracledb.makedsn("195.168.9.216", 1521, service_name="xe")
+con = oracledb.connect(user="mb", password="mobridge", dsn=dsn)
 cursor = con.cursor()
 
 # 지오코딩된 파일 경로
