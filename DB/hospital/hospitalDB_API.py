@@ -31,7 +31,7 @@ with open("새 폴더\\MS_Project-DRT_2025-\\DB\\hospital\\files\\hospitals_raw.
         
 print("✅ 병원 기본정보 파일 저장 완료: hospitals_raw.csv")
 
-# ======== STEP 2: 컬럼명 영어로 변환 ========
+# ======== STEP 2: 컬럼명 영어로 변환 ======== # 지오코딩 변환시 컬럼명 영문으로 변경 필요해서 
 column_map = {
     "의료기관명": "name",
     "소재지": "address",

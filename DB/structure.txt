@@ -1,0 +1,49 @@
+Windows  볼륨에 대한 폴더 경로의 목록입니다.
+볼륨 일련 번호는 DE26-9533입니다.
+C:.
+│  auth.py
+│  database.py
+│  face_utils.py
+│  main.py
+│  query_llm.py
+│  routing.py
+│  structure.txt
+│  test.m4a.m4a
+│  users.py
+│  whisper_integration.py
+│  
+├─hospital
+│  │  (x)hospitalDB.py
+│  │  (X)hospitalDB_Oracle.py
+│  │  hospitalDB_API.py
+│  │  hospitalDB_Oracle.py
+│  │  hospital_DeptDB_Oracle.py
+│  │  
+│  └─files
+│          hospitals_english(excel).xlsx
+│          hospitals_english.csv
+│          hospitals_geocoded_final.csv
+│          hospitals_raw.csv
+│          l_c0903a3bc93d414e8f7b84cd33264ee0.csv
+│          l_d07acb94b3de481bb57f48134b6430cb.csv
+│          인천광역시_의료기관 현황_20240630.csv
+│          
+├─scripts
+│      generate_fake_users.py
+│      
+├─user
+│  │  userDB_Oracle.py
+│  │  
+│  ├─user_img_original
+│  │      스크린샷 2025-07-25 113043.png
+│  │      
+│  └─user_img_uuid
+└─__pycache__
+        database.cpython-39.pyc
+        main.cpython-39.pyc
+        query_llm.cpython-39.pyc
+        reservations.cpython-39.pyc
+        routing.cpython-39.pyc
+        users.cpython-39.pyc
+        whisper_integration.cpython-39.pyc
+        

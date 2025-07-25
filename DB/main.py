@@ -184,6 +184,7 @@ def create_location(lat: float, lng: float):
     con.commit()
     cursor.close()
     return {"message": "위치 추가 완료"}
+
 #위치조회
 @app.get("/locations")
 def read_locations():
